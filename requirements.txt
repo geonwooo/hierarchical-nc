@@ -1,0 +1,5 @@
+etproctitle==1.3.3
+tensorboard==2.14.1
+tensorboardX==2.6.2.2
+yacs==0.1.8
+matplotlib==3.8.0
