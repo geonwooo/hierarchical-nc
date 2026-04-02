@@ -41,6 +41,12 @@ _C.dataset.num_classes_1 = 0  # level-1 hierarchy classes (0 = no hierarchy)
 _C.dataset.num_classes_2 = 0  # level-2 hierarchy classes (0 = no hierarchy)
 _C.dataset.random_hierarchy = False  # True: randomly split labels; False: use CIFAR100 coarse labels
 _C.dataset.root = "/data/hoyong"
+# --- NEW: hier_type ---
+# 'default'             : legacy (flat or sequential based on num_classes_1)
+# 'sequential'          : 선배님 original
+# 'sequential_residual' : h + α·sg(Wp) residual variant
+# 'factorized'          : coarse + per-group fine → 100-way
+_C.dataset.hier_type = "default"
 
 # ----- backbone BUILDER -----
 _C.backbone = CN()
@@ -69,6 +75,8 @@ _C.scaling.type = "Identity"
 # ----- loss BUILDER -----
 _C.loss = CN()
 _C.loss.loss_type = "CrossEntropyCustom"
+# --- NEW: coarse loss weight for factorized ---
+_C.loss.lambda_coarse = 0.3
 
 _C.loss.LDAM = CN()
 _C.loss.LDAM.drw_epoch = 160
@@ -134,4 +142,3 @@ def update_config(cfg, args):
     cfg.merge_from_list(args.opts)
 
     cfg.freeze()
-
