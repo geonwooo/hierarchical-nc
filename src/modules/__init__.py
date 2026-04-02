@@ -3,6 +3,7 @@ from .pooling_ops import *
 from .reshape_ops import *
 from .scaling_ops import *
 from .loss_ops import *
+from .hier_ops import *
 
 
 class Identity(nn.Module):
@@ -11,4 +12,3 @@ class Identity(nn.Module):
 
     def forward(self, input):
         return input
-
