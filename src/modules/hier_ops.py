@@ -1,15 +1,14 @@
 """
-Hierarchical classifier modules for NC × LM pilot experiments.
-Drop this file into src/modules/ of the senior's codebase.
+Hierarchical classifier modules — updated to handle variable group sizes.
+Supports both balanced (CIFAR-100 GT: 5 per group) and unbalanced (unsupervised) groups.
 """
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from collections import defaultdict
 
 __all__ = ['FactorizedPerGroup']
 
-# CIFAR-100 fine→coarse mapping (same as HierCIFAR100.FINE_TO_COARSE)
-_FINE_TO_COARSE = [
+FINE_TO_COARSE = [
     4,  1, 14,  8,  0,  6,  7,  7, 18,  3,
     3, 14,  9, 18,  7, 11,  3,  9,  7, 11,
     6, 11,  5, 10,  7,  6, 13, 15,  3, 15,
@@ -23,83 +22,68 @@ _FINE_TO_COARSE = [
 ]
 
 
-def _build_mapping(fine_to_coarse, num_coarse=20):
-    """Build fine_class → (coarse_group, within_group_index) mapping."""
-    from collections import defaultdict
-    coarse_to_fine = defaultdict(list)
-    for fine_cls, coarse_cls in enumerate(fine_to_coarse):
-        coarse_to_fine[coarse_cls].append(fine_cls)
-
-    num_fine = len(fine_to_coarse)
-    coarse_idx = torch.zeros(num_fine, dtype=torch.long)
-    local_idx = torch.zeros(num_fine, dtype=torch.long)
-
-    for coarse_cls in range(num_coarse):
-        fine_list = sorted(coarse_to_fine[coarse_cls])
-        for local_i, fine_cls in enumerate(fine_list):
-            coarse_idx[fine_cls] = coarse_cls
-            local_idx[fine_cls] = local_i
-
-    num_fine_per_group = len(coarse_to_fine[0])  # assume uniform (=5 for CIFAR-100)
-    return coarse_idx, local_idx, num_fine_per_group
-
-
 class FactorizedPerGroup(nn.Module):
-    """Per-group factorized classifier.
+    """Per-group factorized head with variable group sizes.
 
-    For each coarse group g, a separate fine-level weight matrix W_g.
-    Final logit for fine class c:
-        logit[c] = coarse_logit[g(c)] + fine_logit_{g(c)}[f(c)]
+    logit[c] = coarse[g(c)] + fine_{g(c)}[l(c)]
 
-    where g(c) = coarse group of c, f(c) = within-group index of c.
-
-    Args:
-        num_features: backbone feature dim (e.g., 4096 for VGG11)
-        num_coarse: number of coarse groups (20)
-        fine_to_coarse: list mapping fine_class → coarse_class
+    Handles both balanced (5 per group) and unbalanced groups.
+    Uses padding + masking for unbalanced cases.
     """
-
     def __init__(self, num_features, num_coarse=20, fine_to_coarse=None):
         super().__init__()
         if fine_to_coarse is None:
-            fine_to_coarse = _FINE_TO_COARSE
+            fine_to_coarse = FINE_TO_COARSE
 
-        coarse_idx, local_idx, num_fine_per_group = _build_mapping(
-            fine_to_coarse, num_coarse)
+        groups = defaultdict(list)
+        for c, g in enumerate(fine_to_coarse):
+            groups[g].append(c)
 
+        num_fine = len(fine_to_coarse)
         self.num_coarse = num_coarse
-        self.num_fine_per_group = num_fine_per_group
-        self.num_fine_total = len(fine_to_coarse)
 
-        # Register as buffers (not parameters, but move to GPU with model)
+        # Max group size (for padding)
+        max_fpg = max(len(groups[g]) for g in range(num_coarse))
+        self.max_fpg = max_fpg
+
+        # Build index maps
+        coarse_idx = torch.zeros(num_fine, dtype=torch.long)
+        local_idx = torch.zeros(num_fine, dtype=torch.long)
+        # Mask for valid positions [num_coarse, max_fpg]
+        valid_mask = torch.zeros(num_coarse, max_fpg, dtype=torch.bool)
+
+        for g in range(num_coarse):
+            for li, c in enumerate(sorted(groups[g])):
+                coarse_idx[c] = g
+                local_idx[c] = li
+                valid_mask[g, li] = True
+
         self.register_buffer('coarse_idx', coarse_idx)
         self.register_buffer('local_idx', local_idx)
+        self.register_buffer('valid_mask', valid_mask)
 
-        # Per-group fine weight: (num_features, num_coarse, num_fine_per_group)
-        # e.g., (4096, 20, 5) for VGG11 + CIFAR-100
+        # Per-group fine weight: [num_features, num_coarse, max_fpg]
         self.fine_weight = nn.Parameter(
-            torch.empty(num_features, num_coarse, num_fine_per_group))
+            torch.empty(num_features, num_coarse, max_fpg))
         self.fine_bias = nn.Parameter(
-            torch.zeros(num_coarse, num_fine_per_group))
-
-        # Init
+            torch.zeros(num_coarse, max_fpg))
         nn.init.kaiming_normal_(self.fine_weight)
+
+        # Store group sizes for reference
+        self.group_sizes = [len(groups[g]) for g in range(num_coarse)]
 
     def forward(self, h, coarse_logits):
         """
         Args:
-            h: (B, D) hidden features
-            coarse_logits: (B, num_coarse) coarse classification logits
-
+            h: [B, D]
+            coarse_logits: [B, num_coarse]
         Returns:
-            logits_fine: (B, num_fine_total) full fine-grained logits
+            logits_fine: [B, num_fine]
         """
-        # Per-group fine logits: (B, num_coarse, num_fine_per_group)
+        # Per-group fine logits: [B, num_coarse, max_fpg]
         fine_all = torch.einsum('bd,dgf->bgf', h, self.fine_weight) + self.fine_bias
 
-        # Assemble 100-way logits using vectorized indexing
-        # coarse_idx[c] = g(c), local_idx[c] = f(c)
-        # logit[c] = coarse_logits[:, g(c)] + fine_all[:, g(c), f(c)]
+        # Assemble: logit[c] = coarse[g(c)] + fine[g(c), l(c)]
         logits_fine = (
             coarse_logits[:, self.coarse_idx]
             + fine_all[:, self.coarse_idx, self.local_idx]
@@ -108,6 +92,7 @@ class FactorizedPerGroup(nn.Module):
         return logits_fine
 
     def extra_repr(self):
+        sizes_str = str(self.group_sizes[:5]) + '...' if len(self.group_sizes) > 5 else str(self.group_sizes)
         return (f'num_coarse={self.num_coarse}, '
-                f'num_fine_per_group={self.num_fine_per_group}, '
-                f'total_fine={self.num_fine_total}')
+                f'max_fpg={self.max_fpg}, '
+                f'group_sizes={sizes_str}')
