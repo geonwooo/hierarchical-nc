@@ -35,7 +35,11 @@ class Trainer:
         self.dual_temp_coarse = getattr(cfg.loss, 'dual_temp_coarse', 1.0)
         self.dual_temp_fine = getattr(cfg.loss, 'dual_temp_fine', 1.0)
         self.nc_reg_weight = getattr(cfg.loss, 'nc_reg_weight', 0.0)
+        self.center_loss_weight = getattr(cfg.loss, 'center_loss_weight', 0.0)
         self.lambda_warmup = getattr(cfg.loss, 'lambda_warmup', False)
+        self.lambda_decay = getattr(cfg.loss, 'lambda_decay', False)
+        self.coarse_detach = getattr(cfg.loss, 'coarse_detach', False)
+        self.two_stage_mode = getattr(cfg.loss, 'two_stage_mode', 'joint')
 
         # NC reg: running class means (updated each batch)
         if self.nc_reg_weight > 0:
@@ -68,6 +72,13 @@ class Trainer:
 
     def _get_lambda(self):
         """Get current λ value. If warmup, anneals from 1.0 → lambda_coarse."""
+        if self.two_stage_mode == 'coarse_only':
+            return 1.0
+        if self.two_stage_mode == 'fine_only':
+            return 0.0
+        if self.lambda_decay:
+            progress = self.epoch / self.num_epochs
+            return self.lambda_coarse * max(0, 1.0 - progress)
         if not self.lambda_warmup:
             return self.lambda_coarse
 
@@ -171,8 +182,13 @@ class Trainer:
 
             if isinstance(outputs, tuple):
                 fine_logits, coarse_logits = outputs
-                loss = self._fine_loss(fine_logits, targets) \
-                     + current_lambda * self._coarse_loss(coarse_logits, tgts_1)
+                if self.coarse_detach:
+                    coarse_det = model(features.detach(), classifier_flag=True)[1]
+                    loss = self._fine_loss(fine_logits, targets) \
+                         + current_lambda * self._coarse_loss(coarse_det, tgts_1)
+                else:
+                    loss = self._fine_loss(fine_logits, targets) \
+                         + current_lambda * self._coarse_loss(coarse_logits, tgts_1)
             else:
                 fine_logits = outputs
                 loss = self._fine_loss(fine_logits, targets)

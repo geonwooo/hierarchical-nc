@@ -112,10 +112,12 @@ def main():
     args_cli = parser.parse_args()
 
     class FakeArgs:
-        def __init__(self, cfg_path):
+        def __init__(self, cfg_path, grouping=None):
             self.cfg = cfg_path
             self.opts = []
-    update_config(cfg, FakeArgs(args_cli.cfg))
+            if grouping:
+                self.opts = ['dataset.grouping_file', grouping]
+    update_config(cfg, FakeArgs(args_cli.cfg, args_cli.grouping))
 
     rank = args_cli.rank
     torch.cuda.set_device(rank)
