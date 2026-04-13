@@ -5,6 +5,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 import os
 import sys
+import json
 import shutil
 import argparse
 import warnings
@@ -18,13 +19,13 @@ import dataset as custom_dataset
 from data_transform.transform_wrapper import get_transform
 from config import cfg, update_config
 from utils.utils import (
-    create_logger,
-    get_optimizer,
-    get_scheduler,
-    get_model,
-    get_category_list,
+    create_logger, get_optimizer, get_scheduler,
+    get_model, get_category_list,
 )
-from core.function import train_model, valid_model, test_model
+from core.function import (
+    train_model, valid_model, test_model,
+    _unpack_batch, collect_nc_stats_inline,
+)
 from core.trainer import Trainer
 from utils.reprod import fix_seed
 from utils.dist import setup, cleanup
@@ -32,27 +33,14 @@ from utils.dist import setup, cleanup
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train")
-
     parser.add_argument(
-        "--cfg",
-        help="decide which cfg to use",
-        required=False,
-        default="configs/cifar10.yaml",
-        type=str,
-    )
+        "--cfg", required=False, default="configs/cifar10.yaml", type=str)
     parser.add_argument(
-        "opts",
-        help="modify config options using the command-line",
-        default=None,
-        nargs=argparse.REMAINDER,
-    )
-
-    args = parser.parse_args()
-    return args
+        "opts", default=None, nargs=argparse.REMAINDER)
+    return parser.parse_args()
 
 
 def main_worker(rank, world_size, args):
-    # ----- BEGIN basic setting -----
     update_config(cfg, args)
     logger = None
 
@@ -64,13 +52,11 @@ def main_worker(rank, world_size, args):
     fix_seed(cfg.seed_num)
 
     if cfg.ddp:
-        print(f"Running basic DDP example on rank {rank}.")
+        print("Running DDP on rank {}.".format(rank))
         setup(rank, world_size, port=cfg.port)
 
     torch.cuda.set_device(rank)
-    # ----- END basic setting -----
 
-    # ----- BEGIN dataset setting -----
     transform_tr = get_transform(cfg, mode='train')
     transform_ts = get_transform(cfg, mode='test')
 
@@ -78,106 +64,110 @@ def main_worker(rank, world_size, args):
         cfg, train=True, download=True, transform=transform_tr)
     valid_set = getattr(custom_dataset, cfg.dataset.dataset)(
         cfg, train=False, download=True, transform=transform_ts)
-    
+
     if not isinstance(train_set.targets, torch.Tensor):
         train_set.targets = torch.tensor(train_set.targets, dtype=torch.long)
     num_classes = len(torch.unique(train_set.targets))
-    num_class_list, ctgy_list = get_category_list(train_set.targets, num_classes, cfg)
-    
+    num_class_list, ctgy_list = get_category_list(
+        train_set.targets, num_classes, cfg)
+
     param_dict = {
         'num_classes': num_classes,
         'num_class_list': num_class_list,
-        'cfg': cfg,
-        'rank': rank,
+        'cfg': cfg, 'rank': rank,
     }
 
     trainsampler = DistributedSampler(train_set) if cfg.ddp else None
-    validsampler = DistributedSampler(valid_set, shuffle=False) if cfg.ddp else None
-    
+    validsampler = DistributedSampler(
+        valid_set, shuffle=False) if cfg.ddp else None
+
     if cfg.ddp:
         batch_size = int(cfg.train.batch_size / world_size)
-        num_workers = int((cfg.train.num_workers+world_size-1)/world_size)
+        num_workers = int(
+            (cfg.train.num_workers + world_size - 1) / world_size)
     else:
         batch_size = cfg.train.batch_size
         num_workers = cfg.train.num_workers
 
     trainloader = DataLoader(
-        train_set,
-        batch_size=batch_size,
+        train_set, batch_size=batch_size,
         shuffle=(trainsampler is None),
-        num_workers=num_workers,
-        pin_memory=cfg.pin_memory,
-        sampler=trainsampler,
-    )
+        num_workers=num_workers, pin_memory=cfg.pin_memory,
+        sampler=trainsampler)
     validloader = DataLoader(
-        valid_set,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=num_workers,
-        pin_memory=cfg.pin_memory,
-        sampler=validsampler,
-    )
-    # ----- END dataset setting -----
+        valid_set, batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, pin_memory=cfg.pin_memory,
+        sampler=validsampler)
 
-    # ----- BEGIN model builder -----
     num_epochs = cfg.train.num_epochs
-
     model = get_model(cfg, num_classes, rank)
-    if cfg.pretrained:  # load pretrained model
+    if cfg.pretrained:
         if os.path.isfile(cfg.pretrained):
             print("=> loading checkpoint '{}'".format(cfg.pretrained))
-            checkpoint = torch.load(cfg.pretrained, map_location='cuda:{}'.format(rank))
+            checkpoint = torch.load(
+                cfg.pretrained, map_location='cuda:{}'.format(rank))
             model.load_state_dict(checkpoint['state_dict'])
     mm = model.module if cfg.ddp or cfg.dp else model
     trainer = Trainer(cfg, rank)
-    criterion = getattr(modules, cfg.loss.loss_type)(param_dict=param_dict).cuda(rank)
+    criterion = getattr(modules, cfg.loss.loss_type)(
+        param_dict=param_dict).cuda(rank)
     optimizer = get_optimizer(cfg, model)
     scheduler = get_scheduler(cfg, optimizer)
-    # ----- END model builder -----
 
-    # ----- BEGIN recording setting -----
-    model_dir = os.path.join(cfg.output_dir, cfg.name, 'seed{:03d}'.format(cfg.seed_num), "models")
+    seed_dir = os.path.join(
+        cfg.output_dir, cfg.name,
+        'seed{:03d}'.format(cfg.seed_num))
+    model_dir = os.path.join(seed_dir, "models")
     if verbose:
-        code_dir = os.path.join(cfg.output_dir, cfg.name, 'seed{:03d}'.format(cfg.seed_num), "codes")
+        code_dir = os.path.join(seed_dir, "codes")
         tensorboard_dir = (
-            os.path.join(cfg.output_dir, cfg.name, 'seed{:03d}'.format(cfg.seed_num), "tensorboard")
-            if cfg.train.tensorboard.enable else None
-        )
+            os.path.join(seed_dir, "tensorboard")
+            if cfg.train.tensorboard.enable else None)
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
         else:
-            shutil.rmtree(code_dir)
-            if (tensorboard_dir is not None) and os.path.exists(tensorboard_dir):
+            if os.path.exists(code_dir):
+                shutil.rmtree(code_dir)
+            if tensorboard_dir and os.path.exists(tensorboard_dir):
                 shutil.rmtree(tensorboard_dir)
         print("=> output model will be saved in {}".format(model_dir))
         current_dir = os.path.dirname(__file__)
         ignore = shutil.ignore_patterns(
-            '*.pyc', '*.so', '*.out', '*pycache*', '*.pth', '*build*', '*output*', '*datasets*'
-        )
-        shutil.copytree(os.path.join(current_dir, '..'), code_dir, ignore=ignore)
+            '*.pyc', '*.so', '*.out', '*pycache*', '*.pth',
+            '*build*', '*output*', '*datasets*')
+        shutil.copytree(
+            os.path.join(current_dir, '..'), code_dir, ignore=ignore)
 
         if tensorboard_dir is not None:
-            dummy_input = torch.rand((1, 3) + cfg.input_size).cuda(rank)
             writer = SummaryWriter(log_dir=tensorboard_dir)
-            pooling_module = mm.pooling
-            writer.add_graph(pooling_module, (dummy_input,))
         else:
             writer = None
-    # ----- END recording setting -----
 
-    # ----- START train & valid -----
+    nc_interval = getattr(cfg.train, 'nc_dynamics_interval', 0)
+    if nc_interval > 0:
+        from builder.network import Network
+        try:
+            f2c = Network._get_fine_to_coarse(cfg)
+        except Exception:
+            f2c = None
+        nc_dataset = getattr(custom_dataset, cfg.dataset.dataset)(
+            cfg, train=True, download=True, transform=transform_ts)
+        nc_loader = DataLoader(
+            nc_dataset, batch_size=256, shuffle=False, num_workers=2)
+        nc_dynamics = []
+        nc_path = os.path.join(seed_dir, "nc_dynamics.json")
+
     best_result, best_epoch, start_epoch = 0, 0, 1
     save_step = cfg.save_step if cfg.save_step != -1 else num_epochs
 
     if verbose:
         logger.info(
-            "-------------------Train start : {} {} {} | {} {} | {} / {}--------------------".format(
+            "-------------------Train start : {} {} {} | {} {} | {} / {} | hier={}--------------------".format(
                 cfg.backbone.type, cfg.pooling.type, cfg.reshape.type,
-                cfg.classifier.type, cfg.scaling.type, 
-                cfg.loss.loss_type,
-                cfg.train.trainer.type,
-            )
-        )
+                cfg.classifier.type, cfg.scaling.type,
+                cfg.loss.loss_type, cfg.train.trainer.type,
+                mm.hier_type))
+
     kwargs_tr, kwargs_val = {}, {}
     if cfg.mixed_precision:
         scaler = torch.cuda.amp.GradScaler()
@@ -188,16 +178,14 @@ def main_worker(rank, world_size, args):
             scheduler.step()
         if cfg.ddp:
             trainsampler.set_epoch(epoch)
-        # train
+
         train_acc, train_loss = train_model(
-            trainloader, model, epoch, num_epochs, optimizer, trainer, 
-            criterion, cfg, logger, verbose, **kwargs_tr
-        )
+            trainloader, model, epoch, num_epochs, optimizer, trainer,
+            criterion, cfg, logger, verbose, **kwargs_tr)
+
         if verbose:
             model_save_path = os.path.join(
-                model_dir,
-                'epoch_{}.pth'.format(epoch),
-            )
+                model_dir, 'epoch_{}.pth'.format(epoch))
             if epoch % save_step == 0:
                 save_dict = {
                     'best_result': best_result,
@@ -206,19 +194,21 @@ def main_worker(rank, world_size, args):
                 if not cfg.save_only_result:
                     save_dict['epoch'] = epoch
                     save_dict['state_dict'] = model.state_dict()
-                    save_dict['scheduler'] = scheduler.state_dict() if scheduler is not None else None
+                    save_dict['scheduler'] = (
+                        scheduler.state_dict()
+                        if scheduler is not None else None)
                     save_dict['optimizer'] = optimizer.state_dict()
-                
                 torch.save(save_dict, model_save_path)
-        loss_dict, acc_dict = {'train_loss': train_loss}, {'train_acc': train_acc}
 
-        # valid
+        loss_dict = {'train_loss': train_loss}
+        acc_dict = {'train_acc': train_acc}
+
         if (cfg.valid_step != -1) and (epoch % cfg.valid_step == 0):
             valid_acc, valid_loss = valid_model(
-                validloader, model, epoch, 
-                criterion, cfg, logger, verbose, rank, **kwargs_val
-            )
-            loss_dict['valid_loss'], acc_dict['valid_acc'] = valid_loss, valid_acc
+                validloader, model, epoch,
+                criterion, cfg, logger, verbose, rank, **kwargs_val)
+            loss_dict['valid_loss'] = valid_loss
+            acc_dict['valid_acc'] = valid_acc
             if verbose:
                 if valid_acc >= best_result:
                     best_result, best_epoch = valid_acc, epoch
@@ -229,46 +219,71 @@ def main_worker(rank, world_size, args):
                     if not cfg.save_only_result:
                         save_dict['epoch'] = epoch
                         save_dict['state_dict'] = model.state_dict()
-                        save_dict['scheduler'] = scheduler.state_dict() if scheduler is not None else None
+                        save_dict['scheduler'] = (
+                            scheduler.state_dict()
+                            if scheduler is not None else None)
                         save_dict['optimizer'] = optimizer.state_dict()
-
-                    torch.save(save_dict, os.path.join(model_dir, 'best_model.pth'))
+                    torch.save(
+                        save_dict,
+                        os.path.join(model_dir, 'best_model.pth'))
 
                 logger.info(
                     "-------------Best Epoch:{:>3d}   Best Acc:{:>5.2f}%------------".format(
-                        best_epoch, best_result * 100
-                    )
-                )
+                        best_epoch, best_result * 100))
+
+        if nc_interval > 0 and epoch % nc_interval == 0:
+            nc_stats = collect_nc_stats_inline(
+                model, nc_loader, num_classes, rank,
+                hier_type=mm.hier_type, f2c=f2c)
+            nc_stats['epoch'] = epoch
+            nc_stats['train_acc'] = train_acc
+            if 'valid_acc' in acc_dict:
+                nc_stats['valid_acc'] = acc_dict['valid_acc']
+            nc_dynamics.append(nc_stats)
+            if verbose:
+                nc1_str = "fine_NC1={:.4f}".format(nc_stats['fine_nc1'])
+                if 'coarse_nc1' in nc_stats:
+                    nc1_str += " coarse_NC1={:.4f}".format(
+                        nc_stats['coarse_nc1'])
+                logger.info("  [NC@{}] {}".format(epoch, nc1_str))
+                with open(nc_path, 'w') as f:
+                    json.dump(nc_dynamics, f, indent=2)
 
         if cfg.train.tensorboard.enable and verbose:
             writer.add_scalars('scalar/acc', acc_dict, epoch)
             writer.add_scalars('scalar/loss', loss_dict, epoch)
+
     if cfg.train.tensorboard.enable and verbose:
         writer.close()
     if verbose:
         logger.info(
-            "-------------------Train Finished: {} (seed:{})-------------------".format(cfg.name, cfg.seed_num)
-        )
+            "-------------------Train Finished: {} (seed:{})-------------------".format(
+                cfg.name, cfg.seed_num))
     if not cfg.save_only_result:
         test_model(
             validloader, cfg, rank, verbose,
-            num_classes=num_classes, pretrained=os.path.join(model_dir, 'best_model.pth')
-        )
+            num_classes=num_classes,
+            pretrained=os.path.join(model_dir, 'best_model.pth'))
+
+    if nc_interval > 0 and verbose:
+        with open(nc_path, 'w') as f:
+            json.dump(nc_dynamics, f, indent=2)
+        print("NC dynamics saved: {}".format(nc_path))
 
     if cfg.ddp:
         cleanup()
-    # ----- END train & valid -----
+
 
 if __name__ == "__main__":
     args = parse_args()
     update_config(cfg, args)
-    
     setproctitle(cfg.proctitle)
 
     if cfg.ddp:
         ngpus_per_node = torch.cuda.device_count()
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(
+            main_worker, nprocs=ngpus_per_node,
+            args=(ngpus_per_node, args))
     else:
         rank = cfg.rank if cfg.rank != -1 else 0
         main_worker(rank, cfg.world_size, args)
-
