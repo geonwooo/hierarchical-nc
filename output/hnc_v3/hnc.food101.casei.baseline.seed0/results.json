@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.food101.casei.baseline.seed0",
+  "dataset": "food101",
+  "case": "i",
+  "mode": "baseline",
+  "seed": 0,
+  "K": 101,
+  "D_last": 64,
+  "D_inter": 512,
+  "best_acc": 74.93,
+  "best_epoch": 85,
+  "params": 11215909,
+  "version": "v3",
+  "h_L": {
+    "nc1": 1.4133,
+    "nc2": 0.1406,
+    "nc3": 0.9394,
+    "K": 101,
+    "D": 64,
+    "K_lt_D": false,
+    "ncc_acc": 74.02
+  },
+  "h_l": {
+    "nc1": 2.6097,
+    "nc2": 0.1123,
+    "nc3": 0.0,
+    "K": 101,
+    "D": 512,
+    "K_lt_D": true,
+    "ncc_acc": 74.69
+  },
+  "concat": {
+    "nc1": 2.6992,
+    "nc2": 0.1372,
+    "nc3": 0.0,
+    "K": 101,
+    "D": 576,
+    "K_lt_D": true,
+    "ncc_acc": 74.29
+  },
+  "linear_ncc_gap": 0.91
+}

@@ -1,0 +1,32 @@
+{
+  "name": "v4.L05-MLP32.R32",
+  "fine": {
+    "nc1": 3.606312561035156,
+    "nc2_deviation": 0.15275996923446655,
+    "nc2_equinorm_std": 0.16701997816562653,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6632999777793884,
+  "coarse": {
+    "nc1": 1.176193618774414,
+    "nc2_deviation": 0.15087871253490448,
+    "nc2_equinorm_std": 0.13139411807060242,
+    "nc3": 0.02215968631207943,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7912999987602234,
+  "per_group_fine": {
+    "mean_nc1": 0.91816272854805,
+    "std_nc1": 0.755497231801744,
+    "mean_nc3": 0,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

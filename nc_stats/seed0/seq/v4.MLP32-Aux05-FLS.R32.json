@@ -1,0 +1,32 @@
+{
+  "name": "v4.MLP32-Aux05-FLS.R32",
+  "fine": {
+    "nc1": 3.6660235595703123,
+    "nc2_deviation": 0.1474178433418274,
+    "nc2_equinorm_std": 0.17559684813022614,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.66839998960495,
+  "coarse": {
+    "nc1": 1.2208892822265625,
+    "nc2_deviation": 0.14663919806480408,
+    "nc2_equinorm_std": 0.14141595363616943,
+    "nc3": -0.036605723202228546,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7806000113487244,
+  "per_group_fine": {
+    "mean_nc1": 0.7402736961841583,
+    "std_nc1": 0.48423213696212913,
+    "mean_nc3": 0,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

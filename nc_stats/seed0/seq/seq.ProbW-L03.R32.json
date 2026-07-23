@@ -1,0 +1,32 @@
+{
+  "name": "seq.ProbW-L03.R32",
+  "fine": {
+    "nc1": 12.88681884765625,
+    "nc2_deviation": 0.19550088047981262,
+    "nc2_equinorm_std": 0.16336534917354584,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.49950000643730164,
+  "coarse": {
+    "nc1": 0.843750286102295,
+    "nc2_deviation": 0.15657588839530945,
+    "nc2_equinorm_std": 0.15814775228500366,
+    "nc3": 0.9382030367851257,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.8014000058174133,
+  "per_group_fine": {
+    "mean_nc1": 4.6318436527252205,
+    "std_nc1": 3.398173567368117,
+    "mean_nc3": 0.012778510991483926,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

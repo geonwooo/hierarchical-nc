@@ -1,0 +1,32 @@
+{
+  "name": "seq.Direct-L30.R32",
+  "fine": {
+    "nc1": 2.7161636352539062,
+    "nc2_deviation": 0.14238300919532776,
+    "nc2_equinorm_std": 0.19954828917980194,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.650600016117096,
+  "coarse": {
+    "nc1": 2.28768310546875,
+    "nc2_deviation": 0.16536955535411835,
+    "nc2_equinorm_std": 0.1354120969772339,
+    "nc3": 0.8275092840194702,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.6916000247001648,
+  "per_group_fine": {
+    "mean_nc1": 0.4884489572048187,
+    "std_nc1": 0.198486054919123,
+    "mean_nc3": 0.8096638888120651,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "v4.Cos16.R32",
+  "fine": {
+    "nc1": 1.691352081298828,
+    "nc2_deviation": 0.12918326258659363,
+    "nc2_equinorm_std": 0.14911921322345734,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6998999714851379,
+  "coarse": {
+    "nc1": 0.6835221767425537,
+    "nc2_deviation": 0.10621006786823273,
+    "nc2_equinorm_std": 0.11195535957813263,
+    "nc3": 0.9593524932861328,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.8159999847412109,
+  "per_group_fine": {
+    "mean_nc1": 0.5576807844638825,
+    "std_nc1": 0.29463318374725433,
+    "mean_nc3": 0.8500733882188797,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

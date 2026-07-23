@@ -1,0 +1,52 @@
+{
+  "experiment": "hnc.cifar100.casei.inter_only",
+  "dataset": "cifar100",
+  "case": "i",
+  "mode": "inter_only",
+  "K": 100,
+  "D_last": 64,
+  "D_inter": 128,
+  "best_acc": 74.93,
+  "best_epoch": 110,
+  "params": 7454692,
+  "h_L": {
+    "nc1": 9.2637,
+    "nc2": 0.271,
+    "nc3": 0.0,
+    "K": 100,
+    "D": 64,
+    "K_lt_D": false,
+    "ncc_acc": 16.68
+  },
+  "h_l": {
+    "nc1": 9.7097,
+    "nc2": 0.1474,
+    "nc3": 0.0147,
+    "K": 100,
+    "D": 128,
+    "K_lt_D": true,
+    "ncc_acc": 62.01
+  },
+  "concat": {
+    "nc1": 6.7087,
+    "nc2": 0.148,
+    "nc3": 0.0,
+    "K": 100,
+    "D": 192,
+    "K_lt_D": true,
+    "ncc_acc": 63.05
+  },
+  "linear_ncc_gap": 12.92,
+  "hier_h_L": {
+    "NMI": 0.75,
+    "ARI": 0.3833
+  },
+  "hier_h_l": {
+    "NMI": 0.845,
+    "ARI": 0.5868
+  },
+  "hier_concat": {
+    "NMI": 0.8221,
+    "ARI": 0.5285
+  }
+}

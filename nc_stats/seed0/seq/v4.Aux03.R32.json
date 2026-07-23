@@ -1,0 +1,32 @@
+{
+  "name": "v4.Aux03.R32",
+  "fine": {
+    "nc1": 2.72621337890625,
+    "nc2_deviation": 0.13951779901981354,
+    "nc2_equinorm_std": 0.1702486276626587,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6807000041007996,
+  "coarse": {
+    "nc1": 1.446728229522705,
+    "nc2_deviation": 0.15034523606300354,
+    "nc2_equinorm_std": 0.1378258615732193,
+    "nc3": 0.8845526576042175,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7638999819755554,
+  "per_group_fine": {
+    "mean_nc1": 0.5548628854751587,
+    "std_nc1": 0.31052525004470843,
+    "mean_nc3": 0.8097615838050842,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

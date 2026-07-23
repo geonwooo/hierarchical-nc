@@ -1,0 +1,32 @@
+{
+  "name": "v3.UnsupConfusion.R32",
+  "fine": {
+    "nc1": 2.751387939453125,
+    "nc2_deviation": 0.1475047618150711,
+    "nc2_equinorm_std": 0.17447996139526367,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.683899998664856,
+  "coarse": {
+    "nc1": 2.2264747619628906,
+    "nc2_deviation": 0.17164576053619385,
+    "nc2_equinorm_std": 0.15075969696044922,
+    "nc3": 0.08763384819030762,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7192999720573425,
+  "per_group_fine": {
+    "mean_nc1": 0.5779143667221069,
+    "std_nc1": 0.367562724583933,
+    "mean_nc3": 0,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

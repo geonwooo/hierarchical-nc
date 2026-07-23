@@ -1,0 +1,32 @@
+{
+  "name": "seq.ProbW-NoSG.R32",
+  "fine": {
+    "nc1": 4.763881225585937,
+    "nc2_deviation": 0.21620184183120728,
+    "nc2_equinorm_std": 0.1998419612646103,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.5766000151634216,
+  "coarse": {
+    "nc1": 2.5258644104003904,
+    "nc2_deviation": 0.24907290935516357,
+    "nc2_equinorm_std": 0.20886972546577454,
+    "nc3": 0.7527174949645996,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.6863999962806702,
+  "per_group_fine": {
+    "mean_nc1": 2.128460832834244,
+    "std_nc1": 3.720444913242782,
+    "mean_nc3": 0.5303140074014664,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

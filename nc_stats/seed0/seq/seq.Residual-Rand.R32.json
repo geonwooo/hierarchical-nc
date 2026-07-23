@@ -1,0 +1,32 @@
+{
+  "name": "seq.Residual-Rand.R32",
+  "fine": {
+    "nc1": 1.8037843322753906,
+    "nc2_deviation": 0.14365360140800476,
+    "nc2_equinorm_std": 0.15332165360450745,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6776999831199646,
+  "coarse": {
+    "nc1": 1.6463499069213867,
+    "nc2_deviation": 0.1746014654636383,
+    "nc2_equinorm_std": 0.15699557960033417,
+    "nc3": 0.05858637019991875,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7105000019073486,
+  "per_group_fine": {
+    "mean_nc1": 0.5189559447765351,
+    "std_nc1": 0.3836137712935703,
+    "mean_nc3": 0.005900393030606211,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

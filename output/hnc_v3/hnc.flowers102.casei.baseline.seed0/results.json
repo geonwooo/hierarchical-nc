@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.flowers102.casei.baseline.seed0",
+  "dataset": "flowers102",
+  "case": "i",
+  "mode": "baseline",
+  "seed": 0,
+  "K": 102,
+  "D_last": 64,
+  "D_inter": 512,
+  "best_acc": 44.51,
+  "best_epoch": 100,
+  "params": 11215974,
+  "version": "v3",
+  "h_L": {
+    "nc1": 1.818,
+    "nc2": 0.2143,
+    "nc3": 0.8501,
+    "K": 102,
+    "D": 64,
+    "K_lt_D": false,
+    "ncc_acc": 41.63
+  },
+  "h_l": {
+    "nc1": 2.0654,
+    "nc2": 0.1673,
+    "nc3": 0.0,
+    "K": 102,
+    "D": 512,
+    "K_lt_D": true,
+    "ncc_acc": 41.42
+  },
+  "concat": {
+    "nc1": 2.1061,
+    "nc2": 0.1996,
+    "nc3": 0.0,
+    "K": 102,
+    "D": 576,
+    "K_lt_D": true,
+    "ncc_acc": 41.7
+  },
+  "linear_ncc_gap": 2.88
+}

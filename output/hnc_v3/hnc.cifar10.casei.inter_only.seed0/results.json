@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.cifar10.casei.inter_only.seed0",
+  "dataset": "cifar10",
+  "case": "i",
+  "mode": "inter_only",
+  "seed": 0,
+  "K": 10,
+  "D_last": 4,
+  "D_inter": 16,
+  "best_acc": 85.1,
+  "best_epoch": 200,
+  "params": 29922,
+  "version": "v3",
+  "h_L": {
+    "nc1": 0.2884,
+    "nc2": 0.4062,
+    "nc3": 0.0,
+    "K": 10,
+    "D": 4,
+    "K_lt_D": false,
+    "ncc_acc": 61.38
+  },
+  "h_l": {
+    "nc1": 0.7359,
+    "nc2": 0.287,
+    "nc3": 0.9484,
+    "K": 10,
+    "D": 16,
+    "K_lt_D": true,
+    "ncc_acc": 83.92
+  },
+  "concat": {
+    "nc1": null,
+    "nc2": null,
+    "nc3": null,
+    "K": 10,
+    "D": null,
+    "K_lt_D": null,
+    "ncc_acc": null
+  },
+  "linear_ncc_gap": 1.18
+}

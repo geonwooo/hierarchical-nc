@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.mnist.casei.concat.seed0",
+  "dataset": "mnist",
+  "case": "i",
+  "mode": "concat",
+  "seed": 0,
+  "K": 10,
+  "D_last": 4,
+  "D_inter": 128,
+  "best_acc": 98.24,
+  "best_epoch": 26,
+  "params": 235702,
+  "version": "v3",
+  "h_L": {
+    "nc1": 0.1589,
+    "nc2": 0.4782,
+    "nc3": 0.0,
+    "K": 10,
+    "D": 4,
+    "K_lt_D": false,
+    "ncc_acc": 81.85
+  },
+  "h_l": {
+    "nc1": 0.4439,
+    "nc2": 0.2166,
+    "nc3": 0.0,
+    "K": 10,
+    "D": 128,
+    "K_lt_D": true,
+    "ncc_acc": 96.64
+  },
+  "concat": {
+    "nc1": 0.4464,
+    "nc2": 0.231,
+    "nc3": 0.828,
+    "K": 10,
+    "D": 132,
+    "K_lt_D": true,
+    "ncc_acc": 96.83
+  },
+  "linear_ncc_gap": 1.41
+}

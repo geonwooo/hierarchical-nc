@@ -1,0 +1,20 @@
+{
+  "fine": {
+    "nc1": 3.2429599253991297,
+    "nc2_deviation": 0.148245388504765,
+    "nc2_equinorm_std": 0.15193927856199085,
+    "nc3": 0.9547197531036595,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "coarse": {
+    "nc1": 3.644225171206581,
+    "nc2_deviation": 0.18961198022473164,
+    "nc2_equinorm_std": 0.22571659617184442,
+    "nc3": 0.5459244978954497,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

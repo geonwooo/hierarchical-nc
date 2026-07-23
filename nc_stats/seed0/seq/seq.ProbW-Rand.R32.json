@@ -1,0 +1,32 @@
+{
+  "name": "seq.ProbW-Rand.R32",
+  "fine": {
+    "nc1": 4.277081298828125,
+    "nc2_deviation": 0.15543074905872345,
+    "nc2_equinorm_std": 0.17741641402244568,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6164000034332275,
+  "coarse": {
+    "nc1": 3.719822311401367,
+    "nc2_deviation": 0.19722896814346313,
+    "nc2_equinorm_std": 0.17582187056541443,
+    "nc3": 0.09136726707220078,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.6309999823570251,
+  "per_group_fine": {
+    "mean_nc1": 1.0592226564884188,
+    "std_nc1": 2.2411307475572375,
+    "mean_nc3": 0.02616442955331877,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

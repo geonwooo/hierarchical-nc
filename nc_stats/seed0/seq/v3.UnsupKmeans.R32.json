@@ -1,0 +1,32 @@
+{
+  "name": "v3.UnsupKmeans.R32",
+  "fine": {
+    "nc1": 2.7470782470703123,
+    "nc2_deviation": 0.1444670855998993,
+    "nc2_equinorm_std": 0.16461120545864105,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6776999831199646,
+  "coarse": {
+    "nc1": 1.9296760559082031,
+    "nc2_deviation": 0.1712162345647812,
+    "nc2_equinorm_std": 0.13377493619918823,
+    "nc3": -0.042669642716646194,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7172999978065491,
+  "per_group_fine": {
+    "mean_nc1": 0.5476950156688691,
+    "std_nc1": 0.3085163282294623,
+    "mean_nc3": -0.013576022442430257,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "CE.CIFAR100.ResNet32.200epoch",
+  "fine": {
+    "nc1": 2.9856011962890623,
+    "nc2_deviation": 0.15762503445148468,
+    "nc2_equinorm_std": 0.15230804681777954,
+    "nc3": 0.8778125643730164,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6948999762535095
+}

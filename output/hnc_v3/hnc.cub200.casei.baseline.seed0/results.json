@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.cub200.casei.baseline.seed0",
+  "dataset": "cub200",
+  "case": "i",
+  "mode": "baseline",
+  "seed": 0,
+  "K": 200,
+  "D_last": 128,
+  "D_inter": 2048,
+  "best_acc": 53.76,
+  "best_epoch": 100,
+  "params": 23796104,
+  "version": "v3",
+  "h_L": {
+    "nc1": 1.3128,
+    "nc2": 0.1911,
+    "nc3": 0.9233,
+    "K": 200,
+    "D": 128,
+    "K_lt_D": false,
+    "ncc_acc": 53.87
+  },
+  "h_l": {
+    "nc1": 4.1962,
+    "nc2": 0.1719,
+    "nc3": 0.0,
+    "K": 200,
+    "D": 2048,
+    "K_lt_D": true,
+    "ncc_acc": 54.54
+  },
+  "concat": {
+    "nc1": 1.2334,
+    "nc2": 0.1876,
+    "nc3": 0.0,
+    "K": 200,
+    "D": 2176,
+    "K_lt_D": true,
+    "ncc_acc": 54.26
+  },
+  "linear_ncc_gap": -0.11
+}

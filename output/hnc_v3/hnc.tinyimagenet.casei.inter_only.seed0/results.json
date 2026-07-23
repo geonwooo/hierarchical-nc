@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.tinyimagenet.casei.inter_only.seed0",
+  "dataset": "tinyimagenet",
+  "case": "i",
+  "mode": "inter_only",
+  "seed": 0,
+  "K": 200,
+  "D_last": 128,
+  "D_inter": 2048,
+  "best_acc": 49.98,
+  "best_epoch": 95,
+  "params": 24180104,
+  "version": "v3",
+  "h_L": {
+    "nc1": 8.8389,
+    "nc2": 0.1395,
+    "nc3": 0.0,
+    "K": 200,
+    "D": 128,
+    "K_lt_D": false,
+    "ncc_acc": 43.05
+  },
+  "h_l": {
+    "nc1": 4.3429,
+    "nc2": 0.1165,
+    "nc3": 0.7927,
+    "K": 200,
+    "D": 2048,
+    "K_lt_D": true,
+    "ncc_acc": 49.63
+  },
+  "concat": {
+    "nc1": null,
+    "nc2": null,
+    "nc3": null,
+    "K": 200,
+    "D": null,
+    "K_lt_D": null,
+    "ncc_acc": null
+  },
+  "linear_ncc_gap": 0.35
+}

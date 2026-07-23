@@ -1,0 +1,42 @@
+{
+  "experiment": "hnc.flowers102.casei.concat.seed0",
+  "dataset": "flowers102",
+  "case": "i",
+  "mode": "concat",
+  "seed": 0,
+  "K": 102,
+  "D_last": 64,
+  "D_inter": 512,
+  "best_acc": 46.27,
+  "best_epoch": 80,
+  "params": 11268198,
+  "version": "v3",
+  "h_L": {
+    "nc1": 2.0009,
+    "nc2": 0.2356,
+    "nc3": 0.0,
+    "K": 102,
+    "D": 64,
+    "K_lt_D": false,
+    "ncc_acc": 39.71
+  },
+  "h_l": {
+    "nc1": 1.6346,
+    "nc2": 0.1621,
+    "nc3": 0.0,
+    "K": 102,
+    "D": 512,
+    "K_lt_D": true,
+    "ncc_acc": 42.22
+  },
+  "concat": {
+    "nc1": 1.6412,
+    "nc2": 0.1752,
+    "nc3": 0.7757,
+    "K": 102,
+    "D": 576,
+    "K_lt_D": true,
+    "ncc_acc": 42.33
+  },
+  "linear_ncc_gap": 3.94
+}

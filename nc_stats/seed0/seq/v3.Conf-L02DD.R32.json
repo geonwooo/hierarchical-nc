@@ -1,0 +1,32 @@
+{
+  "name": "v3.Conf-L02DD.R32",
+  "fine": {
+    "nc1": 2.9107452392578126,
+    "nc2_deviation": 0.15056581795215607,
+    "nc2_equinorm_std": 0.1629338413476944,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6822999715805054,
+  "coarse": {
+    "nc1": 2.490867042541504,
+    "nc2_deviation": 0.1822989583015442,
+    "nc2_equinorm_std": 0.15217137336730957,
+    "nc3": 0.1040586605668068,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.6929000020027161,
+  "per_group_fine": {
+    "mean_nc1": 0.5416932916641235,
+    "std_nc1": 0.3679689408361696,
+    "mean_nc3": 0,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

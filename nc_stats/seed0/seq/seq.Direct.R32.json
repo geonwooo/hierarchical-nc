@@ -1,0 +1,32 @@
+{
+  "name": "seq.Direct.R32",
+  "fine": {
+    "nc1": 2.9123501586914062,
+    "nc2_deviation": 0.14200791716575623,
+    "nc2_equinorm_std": 0.1737505942583084,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6830000281333923,
+  "coarse": {
+    "nc1": 1.4071953773498536,
+    "nc2_deviation": 0.15114787220954895,
+    "nc2_equinorm_std": 0.1378151774406433,
+    "nc3": 0.8900660276412964,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.76910001039505,
+  "per_group_fine": {
+    "mean_nc1": 0.6068336510658264,
+    "std_nc1": 0.39253841264922856,
+    "mean_nc3": 0.8343832671642304,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

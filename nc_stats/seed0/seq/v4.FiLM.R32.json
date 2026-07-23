@@ -1,0 +1,32 @@
+{
+  "name": "v4.FiLM.R32",
+  "fine": {
+    "nc1": 2.199420166015625,
+    "nc2_deviation": 0.14523246884346008,
+    "nc2_equinorm_std": 0.17131860554218292,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.6793000102043152,
+  "coarse": {
+    "nc1": 1.4518099784851075,
+    "nc2_deviation": 0.16161924600601196,
+    "nc2_equinorm_std": 0.1381647288799286,
+    "nc3": 0.007425118237733841,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.7677000164985657,
+  "per_group_fine": {
+    "mean_nc1": 0.5720988929271698,
+    "std_nc1": 0.3827365318097499,
+    "mean_nc3": 0,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "v3.Km-L03Det.R32",
+  "fine": {
+    "nc1": 3.1089657592773436,
+    "nc2_deviation": 0.15483351051807404,
+    "nc2_equinorm_std": 0.1707204133272171,
+    "nc3": 0.0,
+    "num_classes": 100,
+    "feature_dim": 64,
+    "K_less_than_D": false
+  },
+  "fine_ncm_acc": 0.683899998664856,
+  "coarse": {
+    "nc1": 2.4287763595581056,
+    "nc2_deviation": 0.18132679164409637,
+    "nc2_equinorm_std": 0.15885141491889954,
+    "nc3": -0.032524459064006805,
+    "num_classes": 20,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  },
+  "coarse_ncm_acc": 0.6963000297546387,
+  "per_group_fine": {
+    "mean_nc1": 0.5341272926330567,
+    "std_nc1": 0.30001310590088653,
+    "mean_nc3": -0.003311169031076133,
+    "num_groups": 20,
+    "K_per_group": 5,
+    "feature_dim": 64,
+    "K_less_than_D": true
+  }
+}
